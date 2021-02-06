@@ -1,5 +1,5 @@
 """
-Name-US:BOCW wpn Import .mtl (tiff) c4d...
+Name-US:BO4 Characters Import .mtl (png) c4d...
 Description-US:Run this script after importing an .obj file. It will parse the .mtl files and build the materials.
 
 
@@ -209,7 +209,8 @@ def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
         mat[c4d.REFLECTION_LAYER_MAIN_DISTRIBUTION +  refLayer.GetDataID()] = 2
         mat[c4d.REFLECTION_LAYER_MAIN_VALUE_ROUGHNESS +  refLayer.GetDataID()] = 1
         mat[c4d.REFLECTION_LAYER_MAIN_VALUE_REFLECTION +  refLayer.GetDataID()] = 1
-        mat[c4d.REFLECTION_LAYER_MAIN_VALUE_SPECULAR +  refLayer.GetDataID()] = 1
+        mat[c4d.REFLECTION_LAYER_MAIN_VALUE_SPECULAR +  refLayer.GetDataID()] = 0
+        mat[c4d.REFLECTION_LAYER_COLOR_BRIGHTNESS  +  refLayer.GetDataID()] = 0.2
         mat[c4d.MATERIAL_NORMAL_REVERSEY] = True
 
 
@@ -270,7 +271,7 @@ def ParseFile(fName, targetDoc):
                 if words[0] ==  'normalMap':
                     normalFlipY = 1
                 DebugPrint('  Found map ' + MTL_KEYWORDS_NAMES[MTL_KEYWORDS_MAP[words[0]]] + ': ' + words[1])
-                InsertTexture(basePath, mapName+'.tiff', matName , targetChannel, targetDoc, normalFlipY)
+                InsertTexture(basePath, mapName+'.png', matName , targetChannel, targetDoc, normalFlipY)
 
         # Check for colors
         elif words[0] in MTL_KEYWORDS_COLOR:

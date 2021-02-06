@@ -36,7 +36,7 @@ MTL_KEYWORDS_MAP = {
                      'normalMap' : c4d.MATERIAL_NORMAL_SHADER,
                      'aoMap' : c4d.MATERIAL_DIFFUSION_SHADER,
                      'emissiveMap' : c4d.MATERIAL_LUMINANCE_SHADER,
-                     'unk_semantic_0xE9817F0D' : c4d.REFLECTION_LAYER_LAYER_DATA + c4d.REFLECTION_LAYER_LAYER_SIZE*4 + c4d.REFLECTION_LAYER_MAIN_SHADER_ROUGHNESS,
+                     'glossMap' : c4d.REFLECTION_LAYER_LAYER_DATA + c4d.REFLECTION_LAYER_LAYER_SIZE*4 + c4d.REFLECTION_LAYER_MAIN_SHADER_ROUGHNESS,
 
                    }
 
