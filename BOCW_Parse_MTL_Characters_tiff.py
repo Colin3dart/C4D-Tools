@@ -149,7 +149,7 @@ def SetMatProperty(matName, value, targetId, targetDoc):
 
 
 # Insert a texture into a channel of a material in a document. Create material, if necessary.
-def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
+def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY, enableAlpha):
     DebugPrint('  -> Inserting "' + fName + '" into channel "' + MTL_KEYWORDS_NAMES[targetId] + '" of material "' + matName + '".')
     mat = targetDoc.SearchMaterial(matName)
 
@@ -167,6 +167,7 @@ def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
 
     # Create a new bitmap shader, insert texture
     tShader = c4d.BaseShader(c4d.Xbitmap)
+    aShader = c4d.BaseShader(c4d.Xbitmap)
     if tShader == None:
         DebugPrint('     ERROR: COULD NOT ALLOCATE BITMAP SHADER!')
         return
@@ -174,7 +175,8 @@ def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
     fSlash = '/'
     fPath = str(fBase) + str(fSlash) + str(fName)
 
-    tShader[c4d.BITMAPSHADER_FILENAME] = fPath #
+    tShader[c4d.BITMAPSHADER_FILENAME] = fPath
+    aShader[c4d.BITMAPSHADER_FILENAME] = fPath
 
     # Add undo
     targetDoc.AddUndo(c4d.UNDOTYPE_CHANGE, mat)
@@ -184,6 +186,7 @@ def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
 
     # Insert texture into channel
     mat[targetId] = tShader
+
 
     # Insert shader into node tree
     mat.InsertShader(tShader)
@@ -216,6 +219,18 @@ def InsertTexture(fBase, fName, matName, targetId, targetDoc, flipNormalY):
 
     # Update material
     mat.Update(True, True)
+    
+    if enableAlpha == 1:
+
+        targetDoc.AddUndo(c4d.UNDOTYPE_CHANGE, mat)
+        mat[c4d.MATERIAL_ALPHA_SHADER] = aShader
+        mat[c4d.MATERIAL_USE_ALPHA] = True
+        
+        if  'gen_eye' in fName:
+            mat[c4d.MATERIAL_USE_ALPHA] = False
+                  
+        mat.InsertShader(aShader)
+        mat.Update(True,True)
 
 
 # Iterate lines of .mtl file, extract data, insert data into document
@@ -232,6 +247,7 @@ def ParseFile(fName, targetDoc):
     mapCount = 0
     lineNr = 0
     normalFlipY = 0
+    enableAlpha = 0
     fl = open(fName)
 
     targetDoc.StartUndo()
@@ -269,9 +285,13 @@ def ParseFile(fName, targetDoc):
                 mapName = words[1]
                 mapCount += 1
                 if words[0] ==  'normalMap':
-                    normalFlipY = 1
+                     normalFlipY = 1
+                if words[0] == 'colorMap':
+                     DebugPrint('ENABLE ALPHA')
+                     enableAlpha = 1
                 DebugPrint('  Found map ' + MTL_KEYWORDS_NAMES[MTL_KEYWORDS_MAP[words[0]]] + ': ' + words[1])
-                InsertTexture(basePath, mapName+'.tiff', matName , targetChannel, targetDoc, normalFlipY)
+                InsertTexture(basePath, mapName+'.tiff', matName , targetChannel, targetDoc, normalFlipY, enableAlpha)
+                enableAlpha = 0
 
         # Check for colors
         elif words[0] in MTL_KEYWORDS_COLOR:
